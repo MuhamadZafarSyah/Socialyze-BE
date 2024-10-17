@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+// INI SAMA AJA KAYAK 
+// di table post kan mau relasi ke user dan
+
+// PADA TABLE POST
+// unsignBigInteger("authorid")
+// foreign("authorid")->referance("id")->on("user")->cascadeondelete()
+
+// PADA TABLE USER HARUS MENERIMA RELASI DENGAN TAMBAHIN NAMA TABLENYA
+// posts Post[], -> artinya onToMany, kalo many harus pake array
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  profile   Profile?
+  posts     Post[]
+  comments  Comment[]
+  likes     Like[]
+  following Follow[] @relation("UserFollowing")
+  followers Follow[] @relation("UserFollowers")
+  snaps     Snap[]
+  savedPosts SavedPost[]
+}
+
+model Profile {
+  id         String  @id @default(uuid())
+  userId     String  @unique
+  user       User    @relation(fields: [userId], references: [id])
+  name       String 
+  username   String  @unique
+  bio        String?
+  link       String?
+  gender     Gender
+  avatar     String?
+  category   String?
+  followers  String?
+  following  String?
+  createdAt  DateTime @default(now())
+}
+
+model Follow {
+  id             String   @id @default(uuid())
+  followingUserId String
+  followedUserId  String
+  createdAt      DateTime @default(now())
+
+  followingUser User @relation("UserFollowing", fields: [followingUserId], references: [id])
+  followedUser  User @relation("UserFollowers", fields: [followedUserId], references: [id])
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  description String?
+  postImage   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  comments    Comment[]
+  likes       Like[]
+  savedPosts  SavedPost[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Snap {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  snapImage String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model SavedPost {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
