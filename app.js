@@ -26,8 +26,9 @@ app.use(
     origin: ["http://localhost:5173"],
   })
 );
+
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.status(200).json("Welcome To Socialyze");
 });
 
 app.listen(port, () => {
