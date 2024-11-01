@@ -70,7 +70,7 @@ export const getSnap = asyncHandler(async (req, res) => {
     where: {
       profileId: profile.id,
       expiresAt: {
-        lt: new Date(), // less than current time
+        lt: new Date(),
       },
     },
   });
@@ -79,7 +79,7 @@ export const getSnap = asyncHandler(async (req, res) => {
     where: {
       profileId: profile.id,
       expiresAt: {
-        gt: new Date(), // greater than current time
+        gt: new Date(),
       },
     },
     include: {
@@ -140,8 +140,7 @@ export const createSnap = asyncHandler(async (req, res) => {
     data: {
       snapImage: req.body.snapImage,
       profileId: checkProfile.id,
-      expiresAt: new Date(Date.now() + 20 * 1000), // 10 detik dari sekarang
-      // expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12 jam dari sekarang
+      expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000),
     },
   });
 

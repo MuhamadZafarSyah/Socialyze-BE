@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import asyncHandler from "../middleware/asyncHandler.js";
-import Joi from "joi";
 
 const prisma = new PrismaClient();
 

@@ -23,8 +23,8 @@ export const followUser = asyncHandler(async (req, res) => {
 
   const checkFollow = await prisma.follow.findFirst({
     where: {
-      followingProfileId: req.user.profile.id, // ID profil pengguna login
-      followedProfileId: profileYgMauDiFollow, // ID profil yang di-follow
+      followingProfileId: req.user.profile.id,
+      followedProfileId: profileYgMauDiFollow,
     },
   });
 
@@ -34,8 +34,8 @@ export const followUser = asyncHandler(async (req, res) => {
   }
   const follow = await prisma.follow.create({
     data: {
-      followingProfileId: req.user.profile.id, // ID profil pengguna login
-      followedProfileId: profileYgMauDiFollow, // ID profil yang di-follow
+      followingProfileId: req.user.profile.id,
+      followedProfileId: profileYgMauDiFollow,
     },
   });
 
@@ -93,7 +93,6 @@ export const getUserFollowers = asyncHandler(async (req, res) => {
     throw new Error("Tidak diizinkan, profil pengguna tidak ditemukan");
   }
 
-  // Query untuk mendapatkan siapa saja yang mengikuti user (followers)
   const followers = await prisma.follow.findMany({
     where: {
       followedProfileId: checkProfile.id,
