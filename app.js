@@ -20,13 +20,6 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("./public"));
 
-app.use(
-  cors({
-    credentials: true,
-    origin: ["http://localhost:5173"],
-  })
-);
-
 app.get("/", (req, res) => {
   res.status(200).json("Welcome To Socialyze");
 });
