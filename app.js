@@ -1,20 +1,31 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
 import authRoute from "./routes/authRoute.js";
 import userRouter from "./routes/userRouter.js";
 import postRouter from "./routes/postRoute.js";
+import commentRouter from "./routes/commentRoute.js";
+import followRouter from "./routes/followsRoute.js";
+import likeRouter from "./routes/likeRoute.js";
+import savePostRouter from "./routes/SavePostRoute.js";
+import snapRouter from "./routes/snapRoute.js";
 import cookieParser from "cookie-parser";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
-
-const prisma = new PrismaClient();
+import helmet from "helmet";
+import cors from "cors";
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(helmet());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("./public"));
 
+app.use(
+  cors({
+    credentials: true,
+    origin: ["http://localhost:5173"],
+  })
+);
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -32,22 +43,19 @@ app.use("/api/v1/profile", userRouter);
 // API FOR ALL POSTS
 app.use("/api/v1/posts", postRouter);
 
-// CONNECT DATABASE
-prisma.$connect(process.env.DATABASE, {}).then(() => {
-  console.log("Berhasil Connect");
-});
+// API FOR GET COMMENTS
+app.use("/api/v1/comments", commentRouter);
 
-async function main() {}
+// API FOR FOLLOW
+app.use("/api/v1/follow", followRouter);
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+// API FOR LIKE POST BY USER
+app.use("/api/v1/like", likeRouter);
+
+// API FOR SAVE POST BY ID POST
+app.use("/api/v1/save", savePostRouter);
+
+app.use("/api/v1/stories", snapRouter);
 
 app.use(errorHandler);
 app.use(notFound);

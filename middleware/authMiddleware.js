@@ -1,24 +1,31 @@
-import { PrismaClient } from "@prisma/client";
 import asyncHandler from "./asyncHandler.js ";
 import jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export const protectedMiddleware = asyncHandler(async (req, res, next) => {
-  let token;
-
-  token = req.cookies.jwt;
+  let token = req.cookies.jwt;
 
   if (token) {
     try {
       const decode = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: {
           id: decode.id,
         },
+        include: {
+          profile: true,
+        },
       });
-      // req.user = await User.findById(decode.id).select("-password");
+
+      if (!user) {
+        res.status(401);
+        throw new Error("Tidak diizinkan, pengguna tidak ditemukan");
+      }
+
+      req.user = user;
       next();
     } catch (error) {
       res.status(401);

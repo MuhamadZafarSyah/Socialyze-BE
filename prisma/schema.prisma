@@ -29,13 +29,7 @@ model User {
   password  String
   createdAt DateTime @default(now())
   profile   Profile?
-  posts     Post[]
-  comments  Comment[]
-  likes     Like[]
-  following Follow[] @relation("UserFollowing")
-  followers Follow[] @relation("UserFollowers")
-  snaps     Snap[]
-  savedPosts SavedPost[]
+ 
 }
 
 model Profile {
@@ -49,26 +43,33 @@ model Profile {
   gender     Gender
   avatar     String?
   category   String?
-  followers  String?
-  following  String?
+   following   Follow[] @relation("ProfileFollowing")
+  followers   Follow[] @relation("ProfileFollowers")
+   posts     Post[]
+  comments  Comment[]
+  likes     Like[]
+ 
+  snaps     Snap[]
+  savedPosts SavedPost[]
   createdAt  DateTime @default(now())
 }
 
 model Follow {
-  id             String   @id @default(uuid())
-  followingUserId String
-  followedUserId  String
-  createdAt      DateTime @default(now())
+  id                 String   @id @default(uuid())
+  followingProfileId String
+  followedProfileId  String
+  createdAt          DateTime @default(now())
 
-  followingUser User @relation("UserFollowing", fields: [followingUserId], references: [id])
-  followedUser  User @relation("UserFollowers", fields: [followedUserId], references: [id])
+  followingProfile Profile @relation("ProfileFollowing", fields: [followingProfileId], references: [id])
+  followedProfile  Profile @relation("ProfileFollowers", fields: [followedProfileId], references: [id])
 }
+
 
 model Post {
   id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  description String?
+  profileId      String
+  profile        Profile     @relation(fields: [profileId], references: [id])
+  caption  String?
   postImage   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -79,10 +80,10 @@ model Post {
 
 model Comment {
   id        String   @id @default(uuid())
-  userId    String
+  profileId    String
+  profile      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade) 
   postId    String
-  user      User     @relation(fields: [userId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id] , onDelete: Cascade)
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,17 +91,17 @@ model Comment {
 
 model Like {
   id        String   @id @default(uuid())
-  userId    String
+  profileId    String
   postId    String
-  user      User     @relation(fields: [userId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id])
+  profile      Profile     @relation(fields: [profileId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id] , onDelete: Cascade)
   createdAt DateTime @default(now())
 }
 
 model Snap {
   id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  profileId    String
+  profile      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
   snapImage String
   expiresAt DateTime
   createdAt DateTime @default(now())
@@ -108,10 +109,10 @@ model Snap {
 
 model SavedPost {
   id        String   @id @default(uuid())
-  userId    String
+  profileId    String
   postId    String
-  user      User     @relation(fields: [userId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id])
+  profile      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
 

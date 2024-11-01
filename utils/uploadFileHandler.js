@@ -42,11 +42,11 @@ const uploadToFTP = async (file, folder) => {
       host: process.env.FTP_HOST,
       user: process.env.FTP_USER,
       password: process.env.FTP_PASSWORD,
+      secure: true, // Use FTPS if the server supports it
       secureOptions: {
         rejectUnauthorized: false, // Disable strict checking (use with caution)
       },
-      secure: true, // Use FTPS if the server supports it
-      timeout: 30000000, // 30 seconds timeout
+      timeout: 3000000000, // 30 seconds timeout
     });
 
     const remoteDirPath = `/${folder}`;
@@ -88,15 +88,14 @@ const uploadFile = (fieldName, folder) => {
         });
       });
 
-      if (!req.file) {
-        throw new Error("No file uploaded.");
+      // Jika ada file yang diupload, proses ke FTP
+      if (req.file) {
+        const ftpPath = await uploadToFTP(req.file, folder);
+        req.uploadedFile = {
+          filename: req.file.originalname,
+          path: "https://muhamadzafarsyah.com" + ftpPath,
+        };
       }
-
-      const ftpPath = await uploadToFTP(req.file, folder);
-      req.uploadedFile = {
-        filename: req.file.originalname,
-        path: "https://muhamadzafarsyah.com" + ftpPath,
-      };
       next();
     } catch (error) {
       console.error("Upload Error:", error);

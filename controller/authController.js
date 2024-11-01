@@ -11,9 +11,11 @@ const authSchema = Joi.object({
   email: Joi.string().email().required().messages({
     "string.email": "Email tidak valid",
     "any.required": "Email harus diisi",
+    "string.empty": "Email harus diisi",
   }),
   password: Joi.string().min(6).required().messages({
     "any.required": "Password harus diisi",
+    "string.empty": "Password harus diisi",
     "string.min": "Password minimal 6 karakter",
   }),
 });
@@ -40,10 +42,7 @@ const createSendToken = (user, statusCode, res) => {
   user.password = undefined;
 
   res.status(statusCode).json({
-    status: "success",
-    data: {
-      user,
-    },
+    data: user,
   });
 };
 
@@ -54,7 +53,7 @@ export const register = asyncHandler(async (req, res) => {
     const errorMessages = error.details
       .map((detail) => detail.message)
       .join(", ");
-    return res.status(400).json({ messages: errorMessages });
+    throw new Error(errorMessages);
   }
 
   const { email } = req.body;
@@ -62,6 +61,17 @@ export const register = asyncHandler(async (req, res) => {
 
   const salt = await bcrypt.genSalt(10);
   password = await bcrypt.hash(password, salt);
+
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (existingUser) {
+    res.status(400);
+    throw new Error("Email Sudah Terdaftar");
+  }
 
   const user = await prisma.user.create({
     data: {
@@ -80,20 +90,43 @@ export const login = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Email dan password harus diisi");
   }
+
   const user = await prisma.user.findUnique({
     where: {
       email,
     },
+    select: {
+      id: true,
+      password: true,
+      profile: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+    },
   });
 
-  const comparePassword = await bcrypt.compare(password, user.password);
-
-  if (!user || !comparePassword) {
+  if (!user) {
     return res.status(401).json({
       status: "fail",
       message: "Invalid email or password",
     });
   }
+
+  const comparePassword = await bcrypt.compare(password, user.password);
+
+  if (!comparePassword) {
+    return res.status(401).json({
+      status: "fail",
+      message: "Invalid email or password",
+    });
+  }
+
+  user.profileId = user.profile.id;
+  user.username = user.profile.username;
+  delete user.password;
+  delete user.profile;
 
   createSendToken(user, 200, res);
 });

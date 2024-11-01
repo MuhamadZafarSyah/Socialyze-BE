@@ -3,7 +3,6 @@ import {
   createProfile,
   editProfile,
   getAllUser,
-  myProfile,
   profileDetail,
 } from "../controller/userController.js";
 import { protectedMiddleware } from "../middleware/authMiddleware.js";
@@ -12,13 +11,10 @@ import uploadFile from "../utils/uploadFileHandler.js";
 const router = express.Router();
 
 // NANTI BAKAL KHUSUS ADMIN UNTUK MENDAPATKAN SELURUH DATA USER
-router.get("/getalluser", protectedMiddleware, getAllUser);
+router.get("/users", getAllUser);
 
 // UNTUK USER BISA MENGECEK PROFILE ORANG LAIN
-router.get("/profile-detail/:id", protectedMiddleware, profileDetail);
-
-// UNTUK USER MENGETAHUI DATA DIRI
-router.get("/my-profile", protectedMiddleware, myProfile);
+router.get("/:username", protectedMiddleware, profileDetail);
 
 // SETELAH LOGIN USER DIPAKSA UNTUK BUAT PROFILE AGAR DAPAT MENERUSKAN
 router.post("/create-profile", protectedMiddleware, createProfile);
@@ -32,14 +28,16 @@ router.post(
   protectedMiddleware,
   uploadFile("avatar", "profile-picture"),
   (req, res) => {
-    if (req.uploadedFile) {
-      // File berhasil diunggah
+    if (req.file) {
       res.json({
         message: "Avatar uploaded successfully",
         data: req.uploadedFile,
       });
     } else {
-      res.status(400).json({ error: "Avatar upload failed" });
+      res.json({
+        message: "No avatar uploaded",
+        data: null,
+      });
     }
   }
 );

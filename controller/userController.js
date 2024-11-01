@@ -1,60 +1,67 @@
-import { json } from "express";
 import { PrismaClient } from "@prisma/client";
-import express from "express";
 import asyncHandler from "../middleware/asyncHandler.js";
 import Joi from "joi";
 
 const prisma = new PrismaClient();
 
-const profileSchema = Joi.object({
-  name: Joi.string().min(1).required().messages({
-    "any.required": "Nama harus diisi",
-    "string.min": "Nama minimal 1 karakter",
-  }),
-
-  username: Joi.string().min(1).required().messages({
-    "any.required": "Username harus diisi",
-    "string.min": "Username minimal 1 karakter",
-  }),
-  gender: Joi.string().required().messages({
-    "any.required": "Gender Harus diisi",
-  }),
-});
-
 export const getAllUser = asyncHandler(async (req, res) => {
   const users = await prisma.profile.findMany();
   res.status(200).json({
-    message: "Success get user",
+    message: "Success get all profile user",
     data: users,
   });
 });
 
 export const profileDetail = asyncHandler(async (req, res) => {
-  const user = await prisma.profile.findUnique({
+  const getUser = await prisma.profile.findUnique({
     where: {
-      id: req.params.id,
+      username: req.params.username,
+    },
+    include: {
+      followers: {
+        where: {
+          followingProfileId: req.user.profile.id,
+        },
+      },
+      _count: {
+        select: {
+          followers: true,
+          following: true,
+          posts: true,
+        },
+      },
+      posts: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          id: true,
+          postImage: true,
+        },
+      },
     },
   });
-  res.status(200).json({
-    message: "Success get detail user",
-    data: user,
-  });
-});
 
-export const myProfile = asyncHandler(async (req, res) => {
-  const myProfile = await prisma.profile.findFirst({
-    where: {
-      userId: req.user.id,
-    },
-  });
+  if (!getUser) {
+    res.status(404);
+    throw new Error("Profile user tidak ditemukan");
+  }
+
+  const profileData = {
+    ...getUser,
+    isFollowing: getUser.followers.length > 0,
+    followers: undefined,
+  };
 
   res.status(200).json({
-    message: "Success get my profile",
-    data: myProfile,
+    message: "Success get detail profile user",
+    data: profileData,
   });
 });
 
 export const createProfile = asyncHandler(async (req, res) => {
+  const { name, username, gender, avatar, bio } = req.body;
+
   const checkProfile = await prisma.profile.findFirst({
     where: {
       userId: req.user.id,
@@ -62,19 +69,8 @@ export const createProfile = asyncHandler(async (req, res) => {
   });
 
   if (checkProfile) {
-    res.status(409);
-    throw new Error("Profile already exist");
+    res.status(400).json({ message: "User already have profile" });
   }
-
-  const { error } = profileSchema.validate(req.body, { abortEarly: false });
-  if (error) {
-    // Map semua pesan error ke dalam array
-    const errorMessages = error.details
-      .map((detail) => detail.message)
-      .join(", ");
-    return res.status(400).json({ messages: errorMessages });
-  }
-  const { name, username, gender } = req.body;
 
   const existingUser = await prisma.profile.findUnique({
     where: { username },
@@ -89,6 +85,8 @@ export const createProfile = asyncHandler(async (req, res) => {
       name,
       username,
       gender,
+      avatar,
+      bio,
       userId: req.user.id,
     },
   });
@@ -104,26 +102,31 @@ export const editProfile = asyncHandler(async (req, res) => {
     where: {
       userId: req.user.id,
     },
+    select: {
+      id: true,
+    },
   });
 
   if (!checkProfile) {
     res.status(404);
-    throw new Error("User not found");
+    throw new Error("Anda Dilarang Untuk Melakukan Aksi ini");
   }
 
+  const { username, ...updateData } = req.body;
+
   const existingUser = await prisma.profile.findUnique({
-    where: { username: req.body.username },
+    where: { username },
   });
 
-  if (existingUser) {
-    return res.status(400).json({ message: "Username sudah dipakai" });
+  if (existingUser && existingUser.id !== checkProfile.id) {
+    throw new Error("Username sudah dipakai");
   }
 
   const updatedProfile = await prisma.profile.update({
     where: {
       id: checkProfile.id,
     },
-    data: req.body,
+    data: { ...updateData, username: username || checkProfile.username },
   });
 
   res.status(200).json({
