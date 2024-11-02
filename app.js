@@ -10,13 +10,21 @@ import snapRouter from "./routes/snapRoute.js";
 import cookieParser from "cookie-parser";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import helmet from "helmet";
-import cors from "cors";
+import sanitizer from "perfect-express-sanitizer";
 const app = express();
 const port = 3000;
 
 app.use(express.json());
 app.use(helmet());
 app.use(cookieParser());
+
+app.use(
+  sanitizer.clean({
+    xss: true,
+    noSql: true,
+    sql: true,
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("./public"));
 
