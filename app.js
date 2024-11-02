@@ -11,9 +11,10 @@ import cookieParser from "cookie-parser";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import helmet from "helmet";
 import sanitizer from "perfect-express-sanitizer";
-const app = express();
-const port = 3000;
 
+const app = express();
+
+// Hapus const port dan app.listen karena Vercel akan menangani ini
 app.use(express.json());
 app.use(helmet());
 app.use(cookieParser());
@@ -28,12 +29,13 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("./public"));
 
-app.get("/", (req, res) => {
-  res.status(200).json("Welcome To Socialyze");
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+app.get("/", (req, res, next) => {
+  try {
+    // kode login
+  } catch (error) {
+    console.error(" error:", error);
+    next(error);
+  }
 });
 
 // API FOR AUTHENTICATION
@@ -61,3 +63,5 @@ app.use("/api/v1/stories", snapRouter);
 
 app.use(errorHandler);
 app.use(notFound);
+
+export default app;
