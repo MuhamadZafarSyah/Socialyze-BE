@@ -29,29 +29,27 @@ model User {
   password  String
   createdAt DateTime @default(now())
   profile   Profile?
- 
 }
 
 model Profile {
-  id         String  @id @default(uuid())
-  userId     String  @unique
-  user       User    @relation(fields: [userId], references: [id])
-  name       String 
-  username   String  @unique
-  bio        String?
-  link       String?
-  gender     Gender
-  avatar     String?
-  category   String?
-   following   Follow[] @relation("ProfileFollowing")
-  followers   Follow[] @relation("ProfileFollowers")
-   posts     Post[]
-  comments  Comment[]
-  likes     Like[]
- 
-  snaps     Snap[]
-  savedPosts SavedPost[]
-  createdAt  DateTime @default(now())
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  username       String    @unique
+  bio            String?
+  link           String?
+  gender         Gender
+  avatar         String?
+  category       String?
+  following      Follow[]  @relation("ProfileFollowing")
+  followers      Follow[]  @relation("ProfileFollowers")
+  posts          Post[]
+  comments       Comment[]
+  likes          Like[]
+  snaps          Snap[]
+  savedPosts     SavedPost[]
+  createdAt      DateTime  @default(now())
 }
 
 model Follow {
@@ -60,16 +58,15 @@ model Follow {
   followedProfileId  String
   createdAt          DateTime @default(now())
 
-  followingProfile Profile @relation("ProfileFollowing", fields: [followingProfileId], references: [id])
-  followedProfile  Profile @relation("ProfileFollowers", fields: [followedProfileId], references: [id])
+  followingProfile Profile @relation("ProfileFollowing", fields: [followingProfileId], references: [id], onDelete: Cascade)
+  followedProfile  Profile @relation("ProfileFollowers", fields: [followedProfileId], references: [id], onDelete: Cascade)
 }
-
 
 model Post {
   id          String   @id @default(uuid())
-  profileId      String
-  profile        Profile     @relation(fields: [profileId], references: [id])
-  caption  String?
+  profileId   String
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  caption     String?
   postImage   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -80,10 +77,10 @@ model Post {
 
 model Comment {
   id        String   @id @default(uuid())
-  profileId    String
-  profile      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade) 
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   postId    String
-  post      Post     @relation(fields: [postId], references: [id] , onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -91,17 +88,17 @@ model Comment {
 
 model Like {
   id        String   @id @default(uuid())
-  profileId    String
+  profileId String
   postId    String
-  profile      Profile     @relation(fields: [profileId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id] , onDelete: Cascade)
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
 
 model Snap {
   id        String   @id @default(uuid())
-  profileId    String
-  profile      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   snapImage String
   expiresAt DateTime
   createdAt DateTime @default(now())
@@ -109,9 +106,9 @@ model Snap {
 
 model SavedPost {
   id        String   @id @default(uuid())
-  profileId    String
+  profileId String
   postId    String
-  profile      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
@@ -121,4 +118,3 @@ enum Gender {
   FEMALE
   OTHER
 }
-
