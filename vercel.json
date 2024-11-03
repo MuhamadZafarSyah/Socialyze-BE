@@ -3,12 +3,16 @@
   "builds": [
     {
       "src": "app.js",
-      "use": "@vercel/node",
-      "config": {
-        "buildCommand": "npm run vercel-build"
-      }
+      "use": "@vercel/node"
     }
   ],
-
-  "routes": [{ "src": "/(.*)", "dest": "app.js" }]
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }

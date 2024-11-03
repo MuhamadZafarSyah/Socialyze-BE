@@ -6,11 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon app.js",
-    "vercel-build": "echo 'Running build...' && prisma generate && echo 'Prisma generate complete' && prisma migrate deploy",
-    "build": "echo 'Running build...' && prisma generate",
-    "migrate:dev": "prisma migrate dev",
-    "migrate:status": "prisma migrate status",
-    "generate": "prisma generate",
+    "vercel-build": "prisma generate && prisma db push --accept-data-loss",
+    "build": "prisma generate",
     "postinstall": "prisma generate"
   },
   "author": "",

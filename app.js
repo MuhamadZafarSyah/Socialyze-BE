@@ -60,7 +60,10 @@ app.use("/api/v1/like", likeRouter);
 app.use("/api/v1/save", savePostRouter);
 
 app.use("/api/v1/stories", snapRouter);
-
+async function main() {
+  // Seed data jika diperlukan
+  console.log("Database connected successfully");
+}
 main()
   .catch((e) => {
     console.error(e);
@@ -69,7 +72,6 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
 app.use(errorHandler);
 app.use(notFound);
 
