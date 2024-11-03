@@ -2,10 +2,10 @@
   "name": "server",
   "type": "module",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "api/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon app.js",
+    "dev": "nodemon api/index.js",
     "vercel-build": "prisma generate && prisma db push --accept-data-loss",
     "build": "prisma generate",
     "postinstall": "prisma generate"
