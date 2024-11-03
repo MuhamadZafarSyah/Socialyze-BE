@@ -11,10 +11,12 @@ import cookieParser from "cookie-parser";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import helmet from "helmet";
 import sanitizer from "perfect-express-sanitizer";
+import cors from "cors";
 
 const app = express();
+const port = 3000;
 
-// Hapus const port dan app.listen karena Vercel akan menangani ini
+app.use(cors());
 app.use(express.json());
 app.use(helmet());
 app.use(cookieParser());
@@ -36,6 +38,10 @@ app.get("/", (req, res, next) => {
     console.error(" error:", error);
     next(error);
   }
+});
+
+app.listen(port, () => {
+  console.log(`Express listening on port ${port}`);
 });
 
 // API FOR AUTHENTICATION
@@ -64,14 +70,7 @@ async function main() {
   // Seed data jika diperlukan
   console.log("Database connected successfully");
 }
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+
 app.use(errorHandler);
 app.use(notFound);
 
