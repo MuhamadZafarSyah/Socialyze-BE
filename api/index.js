@@ -10,6 +10,7 @@ import snapRouter from "../routes/snapRoute.js";
 import cookieParser from "cookie-parser";
 import { errorHandler, notFound } from "../middleware/errorMiddleware.js";
 import helmet from "helmet";
+import cors from "cors";
 import sanitizer from "perfect-express-sanitizer";
 import { PrismaClient } from "@prisma/client";
 
@@ -31,6 +32,12 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", function (req, res) {
+  res.status(200).json({
+    message: "Selamat datang di Socialyze kami",
+  });
+});
+
+app.get("/api/v1/", function (req, res) {
   res.status(200).json({
     message: "Selamat datang di Socialyze kami",
   });
