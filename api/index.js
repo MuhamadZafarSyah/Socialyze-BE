@@ -17,6 +17,12 @@ const prisma = new PrismaClient();
 const app = express();
 const port = 3000;
 
+app.use(
+  cors({
+    origin: "*", // Untuk development, di production ganti dengan domain frontend Anda
+    credentials: true,
+  })
+);
 // Hapus const port dan app.listen karena Vercel akan menangani ini
 app.use(express.json());
 app.use(helmet());
@@ -65,6 +71,11 @@ app.use("/api/v1/like", likeRouter);
 app.use("/api/v1/save", savePostRouter);
 
 app.use("/api/v1/stories", snapRouter);
+
+// Handle 404
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
 
 app.use(errorHandler);
 app.use(notFound);
