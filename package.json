@@ -6,11 +6,12 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon app.js",
-    "vercel-build": "prisma generate && prisma migrate deploy",
-    "build": "prisma generate",
+    "vercel-build": "echo 'Running build...' && prisma generate && echo 'Prisma generate complete' && prisma migrate deploy",
+    "build": "echo 'Running build...' && prisma generate",
     "migrate:dev": "prisma migrate dev",
     "migrate:status": "prisma migrate status",
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "postinstall": "prisma generate"
   },
   "author": "",
   "license": "ISC",
