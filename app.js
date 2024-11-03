@@ -11,33 +11,21 @@ import cookieParser from "cookie-parser";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import helmet from "helmet";
 import sanitizer from "perfect-express-sanitizer";
-import cors from "cors";
 
 const app = express();
 const port = 3000;
 
-app.use(cors());
+// Hapus const port dan app.listen karena Vercel akan menangani ini
 app.use(express.json());
 app.use(helmet());
 app.use(cookieParser());
 
-app.use(
-  sanitizer.clean({
-    xss: true,
-    noSql: true,
-    sql: true,
-  })
-);
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("./public"));
 
-app.get("/", (req, res, next) => {
-  try {
-    // kode login
-  } catch (error) {
-    console.error(" error:", error);
-    next(error);
-  }
+app.get("/", function (req, res) {
+  res.status(200).json({
+    message: "Selamat datang di Socialyze kami",
+  });
 });
 
 app.listen(port, () => {
@@ -66,10 +54,6 @@ app.use("/api/v1/like", likeRouter);
 app.use("/api/v1/save", savePostRouter);
 
 app.use("/api/v1/stories", snapRouter);
-async function main() {
-  // Seed data jika diperlukan
-  console.log("Database connected successfully");
-}
 
 app.use(errorHandler);
 app.use(notFound);
