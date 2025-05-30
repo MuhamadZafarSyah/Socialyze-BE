@@ -22,7 +22,7 @@ router.post("/", protectedMiddleware, createSnap);
 router.post(
   "/upload-snap-image",
   protectedMiddleware,
-  uploadFile("snapImage", "stories"),
+  uploadFile("snapImage", process.env.PATH_FOLDER_UPLOADS + "/stories"),
   (req, res) => {
     if (req.file) {
       res.json({

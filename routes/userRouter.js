@@ -26,7 +26,7 @@ router.put("/edit-profile", protectedMiddleware, editProfile);
 router.post(
   "/upload-profile-picture",
   protectedMiddleware,
-  uploadFile("avatar", "profile-picture"),
+  uploadFile("avatar", process.env.PATH_FOLDER_UPLOADS + "/profile-picture"),
   (req, res) => {
     if (req.file) {
       res.json({
