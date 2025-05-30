@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", function (req, res) {
   res.status(200).json({
-    message: "Selamat datang di Socialyze kami",
+    message: `Selamat datang di Socialyze kami ${process.env.PATH_FILE_UPLOAD} `,
   });
 });
 

@@ -93,7 +93,7 @@ const uploadFile = (fieldName, folder) => {
         const ftpPath = await uploadToFTP(req.file, folder);
         req.uploadedFile = {
           filename: req.file.originalname,
-          path: "https://muhamadzafarsyah.com" + ftpPath,
+          path: process.env.PATH_FILE_UPLOAD + ftpPath,
         };
       }
       next();
