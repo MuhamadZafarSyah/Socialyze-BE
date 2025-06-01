@@ -5,7 +5,12 @@ import path from "path";
 
 // Constants
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
-const ALLOWED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
 
 // Functions
 const fileFilter = (req, file, cb) => {
@@ -93,6 +98,7 @@ const uploadFile = (fieldName, folder) => {
         const ftpPath = await uploadToFTP(req.file, folder);
         req.uploadedFile = {
           filename: req.file.originalname,
+          // path: process.env.PATH_FILE_UPLOAD + ftpPath,
           path: process.env.PATH_FILE_UPLOAD + ftpPath,
         };
       }

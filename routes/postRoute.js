@@ -30,7 +30,7 @@ router.delete("/delete-post/:id", protectedMiddleware, deletePost);
 router.post(
   "/upload-post-image",
   protectedMiddleware,
-  uploadFile("postImage", "socialyze/uploads/post"),
+  uploadFile("postImage", "post"),
   (req, res) => {
     if (req.file) {
       res.json({

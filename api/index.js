@@ -33,13 +33,13 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", function (req, res) {
   res.status(200).json({
-    message: `Selamat datang di Socialyze kami ${process.env.PATH_FOLDER_UPLOADS}/post`,
+    message: `Selamat datang di Socialyze kami`,
   });
 });
 
 app.get("/api/v1/", function (req, res) {
   res.status(200).json({
-    message: `Selamat datang di Socialyze kami ${process.env.PATH_FOLDER_UPLOADS}/post`,
+    message: `Selamat datang di Socialyze kami`,
   });
 });
 
